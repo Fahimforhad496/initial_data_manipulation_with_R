@@ -12,4 +12,42 @@ fulljoinDf <- full_join(claimTable,transectionTable, by = "Claim_No_")
 sdf_dim(fulljoinDf); sdf_nrow(fulljoinDf); sdf_ncol(fulljoinDf)
 View(fulljoinDf)
 head(fulljoinDf)
+spark_write_csv(fulljoinDf, "joined tables",header = TRUE, delimiter = ",", quote = "\"",escape = "\\", charset="UTF-8",mode=NULL)
+
+merged_joiningDf <- spark_read_csv(sc, "merged_joiningDf", "joined tables/*.csv")
+
+sdf_dim(merged_joiningDf); sdf_nrow(merged_joiningDf); sdf_ncol(merged_joiningDf)
+
+glimpse(merged_joiningDf)
+
+print(merged_joiningDf, n=2, width = Inf)
+
+head(merged_joiningDf)
+
+merged_joiningDf<- sdf_coalesce(merged_joiningDf, partitions = 1)
+
+spark_write_csv(merged_joiningDf, "Merged_joinedtables/")
+
+df1<-spark_read_csv(sc, "df1", "Merged_joinedtables/part-00000-485bd11d-d268-4b74-aeb7-42efde8e1e04-c000.csv")
+
+df1 <- select(df1, Client_Name:Claimant_Surname, Claim_Status,Transn_Dt,Tr_Posted,Exp_Code,Descrn,Note_Desc)
+
+head(df1)
+spark_write_csv(df1, "Trimmed_jointable/",header = TRUE, delimiter = ",", quote = "\"",escape = "\\", charset="UTF-8",mode=NULL)
+
+joined_trimmedTable <- spark_read_csv(sc, "joined_trimmedTable", "Trimmed_jointable/*.csv")
+
+sdf_dim(joined_trimmedTable); sdf_nrow(joined_trimmedTable); sdf_ncol(joined_trimmedTable)
+
+glimpse(joined_trimmedTable)
+
+print(joined_trimmedTable, n=2, width = Inf)
+
+head(joined_trimmedTable)
+
+joined_trimmedTable<- sdf_coalesce(joined_trimmedTable, partitions = 1)
+
+spark_write_csv(joined_trimmedTable, "merged_trimmed_joinedTable")
+
+
 
