@@ -1,6 +1,7 @@
 #Include libraries and create a connection
 
 install.packages("tidyverse")
+library(lubridate)
 library(sparklyr)
 library(dplyr)
 library(ggplot2)
