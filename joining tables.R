@@ -49,5 +49,14 @@ joined_trimmedTable<- sdf_coalesce(joined_trimmedTable, partitions = 1)
 
 spark_write_csv(joined_trimmedTable, "merged_trimmed_joinedTable")
 
+df2<-spark_read_csv(sc, "df2", "merged_trimmed_joinedTable/part-00000-91cb6c39-498e-4a53-91d4-5b72a36aabe5-c000.csv")
+df2 <-select(df2,everything()) %>%
+  filter(Exp_Code %in% c("99C Claim","99F Finalise","99I Incident","99R Reopen"))
 
+sdf_dim(df2)
+head(df2)
 
+spark_write_csv(df2,"joined_filteredTable")
+df3<-spark_read_csv(sc, "df3","joined_filteredTable/*.csv")
+df3<-sdf_coalesce(df3,partitions = 1)
+spark_write_csv(df3,"ICFR Extracted and merged")
